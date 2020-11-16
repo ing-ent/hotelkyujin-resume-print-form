@@ -5,9 +5,15 @@
     "module": "es2015",
     "jsx": "react",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "lib": [
       "es2020",
       "dom"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/@types"
     ]
   }
 }
