@@ -37,4 +37,12 @@ module.exports = {
     inline: true,
     historyApiFallback: true,
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      PUBLIC_ACCESS_TOKEN: JSON.stringify(process.env.PUBLIC_ACCESS_TOKEN),
+      API_SERVER: JSON.stringify(process.env.API_SERVER),
+      CLIENT_ID: JSON.stringify(process.env.CLIENT_ID),
+      CLIENT_SECRET: JSON.stringify(process.env.CLIENT_SECRET),
+    })
+  ]
 };
