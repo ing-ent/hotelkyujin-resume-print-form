@@ -4,4 +4,3 @@ npm-debug.log
 *.swp
 package-lock.json
 dist/assets/js/*
-dist/assets/css/*
