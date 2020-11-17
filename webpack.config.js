@@ -30,12 +30,17 @@ module.exports = {
   },
   target: ['web', 'es5'],
   devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
     port: 3004,
     watchContentBase: true,
     open: false,
     inline: true,
     historyApiFallback: true,
+    contentBase: path.resolve(__dirname, 'dist/assets/js'),
+    proxy: {
+      '/': {
+        target: 'http://localhost:3001',
+      },
+    },
   },
   plugins: [
     new webpack.DefinePlugin({

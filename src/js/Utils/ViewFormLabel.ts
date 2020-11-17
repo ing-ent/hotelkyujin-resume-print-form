@@ -1,14 +1,11 @@
-import { conformsTo } from "lodash";
-
-// @flow
-export function view(value: Any): String {
+export function view(value) {
   if (value) {
     return value;
   }
   return '';
 }
 
-export function radioLabel(field: String, value: String, labels: Array): String {
+export function radioLabel(field, value, labels) {
   let label;
   const option = labels.formOptions[field];
   if (option) {
@@ -22,7 +19,7 @@ export function radioLabel(field: String, value: String, labels: Array): String 
   return label;
 }
 
-export function checkboxLabel(field: String, values: String, labels: Array): String {
+export function checkboxLabel(field, values, labels) {
   let label = '';
   const option = labels.formOptions[field];
   if (option) {
@@ -41,19 +38,21 @@ export function checkboxLabel(field: String, values: String, labels: Array): Str
   return label;
 }
 
-export function selectLabel(field: String, value, labels: Array): String {
+export function selectLabel(field, value, labels) {
   let label;
+  console.log(field, value);
   if (value === undefined || Number(value) == 0) {
     return '';
   }
   const option = labels.formOptions[field];
   if (option) {
     for (const o in option) {
-      if (option[o].value === value) {
+      if (option[o].value === String(value)) {
         label = option[o].label;
         break;
       }
     }
   }
+  console.log(label);
   return label;
 }
