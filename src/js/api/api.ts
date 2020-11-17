@@ -3,6 +3,8 @@ import { convertCheckBoxFormData } from '../Utils/ConvertCheckBoxData';
 import { joinFullName } from '../Utils/ConvertFullNameData';
 import { removeDateStringSeparator } from '../Utils/ConvertDateStringSeparator';
 import { removePostalCodeSeparator } from '../Utils/ConvertPostalCodeSeparator';
+import { ConvertCheckBoxOption, ConvertSelectBoxOption } from '../Utils/ConvertFormOption';
+import ConvertLabel from '../Utils/ConvertLabel';
 import { Buffer } from 'buffer';
 
 interface Props {
@@ -11,7 +13,7 @@ interface Props {
   clientState: string
 }
 
-export const getUser = async (props: Props) => {
+export const getUser = async (props: Props): Promise<any> => {
   console.log(props);
   const { code, clientId, clientState } = props;
   // @ts-ignore
@@ -22,23 +24,24 @@ export const getUser = async (props: Props) => {
     // @ts-ignore
     'X-API-KEY': `Bearer ${PUBLIC_ACCESS_TOKEN}`,
   };
+  const body = JSON.stringify({
+    grant_type: 'authorization_code',
+    code: code,
+    client_id: clientId,
+    // @ts-ignore
+    client_secret: CLIENT_SECRET,
+    state: clientState,
+  });
   try {
     const fetchAccessTokenResponse = await fetchWithErrorHandling(
       // @ts-ignore
-      `${API_SERVER}/v1/authentication/user/authorize`, {
+      `${API_SERVER}/v1/authentication/user/token`, {
         method: 'post',
         mode: 'cors',
         cache: 'no-cache',
         credentials: 'include',
         headers: headers,
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          code: code,
-          client_id: clientId,
-          // @ts-ignore
-          client_secret: CLIENT_SECRET,
-          state: clientState,
-        }),
+        body: body,
       },
     );
     const accessToken = await fetchAccessTokenResponse.json();
@@ -49,34 +52,23 @@ export const getUser = async (props: Props) => {
       'X-API-KEY': `Bearer ${accessToken.access_token}`,
     };
 
+    console.log(accessToken);
     // @ts-ignore
-    const fetchUserResponse = await fetchWithErrorHandling(`${API_SERVER}/v1/authentication/user/token`, {
+    const fetchUserResponse = await fetchWithErrorHandling(`${API_SERVER}/v1/user/info/context`, {
       method: 'get',
       headers: userHeaders,
     });
     const user = await fetchUserResponse.json();
+    // console.log(user);
     const personal = user.result.personal;
     const careers = user.result.careers;
-    console.log(personal);
+    // console.log(personal);
     // nullを''に変換する
     for (const key of Object.keys(personal)) {
       if (personal[key] === null) {
         personal[key] = '';
       }
     }
-    console.log(careers);
-    // これを配列からフラットに変換したい
-    // nullを''に変換する
-    for (const [index, career] of careers.entries()) {
-      for (const key of Object.keys(career)) {
-        if (careers[index][key] === null || careers[index][key] === 0) {
-          careers[index][key] = '';
-        } else {
-          careers[index][key] = String(careers[index][key]);
-        }
-      }
-    }
-    console.log(careers);
     // フォームデータ用に整形、マージ
     const formData = {
       ...personal,
@@ -126,6 +118,87 @@ export const getUser = async (props: Props) => {
     return formData;
     } catch (err) {
       console.log(err);
+      const error = await err.response;
+      console.log(error)
     } finally {
   };
 }
+
+/**
+ * ラベルを取得
+ * @return Promise
+ */
+export const getLabels = async () => {
+  const headers = {
+    'Content-Type': 'application/json',
+    // @ts-ignore
+    'X-API-KEY': `Bearer ${PUBLIC_ACCESS_TOKEN}`,
+  };
+  try {
+    // dispatch(loadingPage(true));
+    // await timeout(2000);
+    const response = await fetchWithErrorHandling(
+      // @ts-ignore
+      `${API_SERVER}/v1/dataset/labels`, {
+      method: 'get',
+      headers: headers,
+      // credentials: 'same-origin',
+    });
+    const labels = await response.json();
+    const labelData = {
+      formOptions: {
+        sex: ConvertCheckBoxOption(labels.sex, 'sex'),
+        family: ConvertCheckBoxOption(labels.family, 'family'),
+        address: ConvertSelectBoxOption(labels.address),
+        line: ConvertSelectBoxOption(labels.line),
+        academic: ConvertCheckBoxOption(labels.academic, 'academic'),
+        graduationY: ConvertSelectBoxOption(labels.graduation_y),
+        periodY: ConvertSelectBoxOption(labels.period_y),
+        periodYEnd: ConvertSelectBoxOption(labels.period_y_end),
+        month: ConvertSelectBoxOption(labels.month),
+        english: ConvertCheckBoxOption(labels.english, 'english'),
+        pcOs: ConvertCheckBoxOption(labels.pc_os, 'pc_os'),
+        pcSoft: ConvertCheckBoxOption(labels.pc_soft, 'pc_soft'),
+        pcHotelsoft: ConvertCheckBoxOption(labels.pc_hotelsoft, 'pc_hotelsoft'),
+        employType: ConvertSelectBoxOption(labels.employ_type),
+        serviceCategory: ConvertSelectBoxOption(labels.service_category),
+        area: ConvertSelectBoxOption(labels.area),
+        subarea: ConvertSelectBoxOption(labels.subarea),
+        hopeAddress: ConvertSelectBoxOption(labels.address),
+        workType: ConvertCheckBoxOption(labels.work_type, 'work_type'),
+        hopeReason: ConvertCheckBoxOption(labels.hope_reason, 'hope_reason'),
+        hopeSyugyoStartY: ConvertSelectBoxOption(labels.hope_syugyo_start_y),
+        hopeSyugyoStartM: ConvertSelectBoxOption(labels.hope_syugyo_start_m),
+        hopeKoyoukeitai: ConvertSelectBoxOption(labels.hope_koyoukeitai),
+        hopeNensyu: ConvertSelectBoxOption(labels.hope_nensyu),
+        subjob: ConvertSelectBoxOption(labels.subjob),
+        scout: ConvertCheckBoxOption(labels.scout, 'scout'),
+      },
+      // 表示上必要なラベル
+      labels: {
+        employType: ConvertLabel(labels.employ_type),
+        subjob: ConvertLabel(labels.subjob),
+      },
+      // 初期ラベル
+      defaultLabels: {
+        family: labels.family,
+        pcOs: labels.pc_os,
+        pcSoft: labels.pc_soft,
+        pcHotelsoft: labels.pc_hotelsoft,
+        hopeReason: labels.hope_reason,
+        address: labels.address,
+      },
+    };
+    return labelData;
+    // console.log(responseJson);
+  } catch (err) {
+    // dispatch(loadingPage(false));
+  }
+}
+
+
+
+
+
+
+
