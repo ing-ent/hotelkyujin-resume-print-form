@@ -24,7 +24,10 @@ export default function InputForm(props) {
         if (key === 'employ_type') {
           ca[`${key}_${i}`] = selectLabel('employType', careers[i][key], props.labels);
         } else if (key === 'company_name') {
-          ca[`${key}_${i}`] = `${careers[i][key]} ${selectLabel('serviceCategory', careers[i]['s_category'], props.labels)}`;
+          ca[`${key}_${i}`] = `${careers[i][key]} ${careers[i]['service_name']} (${selectLabel('serviceCategory', careers[i]['s_category'], props.labels)})`;
+        } else if (key === 'end_period_y') {
+          ca[`${key}_${i}`] = careers[i][key] === '9999' ? '現在に至る' : careers[i][key];
+
         } else {
           ca[`${key}_${i}`] = careers[i][key];
         }

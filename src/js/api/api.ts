@@ -1,13 +1,15 @@
 import fetchWithErrorHandling from '../Utils/FetchWithErrorHandling';
 import { convertCheckBoxFormData } from '../Utils/ConvertCheckBoxData';
 import { joinFullName } from '../Utils/ConvertFullNameData';
-import { removeDateStringSeparator } from '../Utils/ConvertDateStringSeparator';
+import { removeDateStringSeparator, addDateStringSeparator } from '../Utils/ConvertDateStringSeparator';
 import { removePostalCodeSeparator } from '../Utils/ConvertPostalCodeSeparator';
 import { ConvertCheckBoxOption, ConvertSelectBoxOption } from '../Utils/ConvertFormOption';
 import ConvertLabel from '../Utils/ConvertLabel';
 import { Buffer } from 'buffer';
 import { initialFormState } from '../state/state';
 import { selectLabel } from '../Utils/ViewFormLabel';
+import moment from 'moment';
+moment.locale('ja');
 
 interface Props {
   code: string
@@ -71,17 +73,21 @@ export const getUser = async (props: Props): Promise<any> => {
         personal[key] = '';
       }
     }
+    const [yyyy, mm, dd] = personal.birthday.split('-');
+    const birth = moment().year(yyyy).month(mm - 1).date(dd);
+    const age = moment().diff(birth, 'years');
     // フォームデータ用に整形、マージ
     const formData = {
       ...initialFormState,
       ...personal,
+      age: age,
+      today: moment(new Date()).format('LL'),
       ...convertCheckBoxFormData(personal, 'family'),
       ...convertCheckBoxFormData(personal, 'pc_os'),
       ...convertCheckBoxFormData(personal, 'pc_soft'),
       ...convertCheckBoxFormData(personal, 'pc_hotelsoft'),
       ...convertCheckBoxFormData(personal, 'hope_reason'),
-      ...removeDateStringSeparator(personal.birthday, 'birthday'),
-      ...removePostalCodeSeparator(personal.postcode, 'postcode'),
+      ...{'birthday': moment(personal.birthday).format('LL')},
       ...joinFullName(personal.l_name, personal.f_name, 'fullname'),
       ...joinFullName(personal.l_kana, personal.f_kana, 'fullname_kana'),
       ...{ graduation_y: personal.graduation_date.split('-')[0] },
@@ -95,7 +101,6 @@ export const getUser = async (props: Props): Promise<any> => {
       ...{ toefl: personal.toefl ? personal.toefl : '' },
       ...{ sep: personal.sep ? personal.sep : '' },
       ...{ english: personal.english ? String(personal.english) : '' },
-      ...{ postcode: `${personal.postcode.slice(0, 3)}-${personal.postcode.slice(3, 7)}` },
       ...{ address: `${selectLabel('address', personal.address1, labels)}${personal.address2}${personal.address3}` },
     };
     // 不要なプロパティは削除

@@ -4,8 +4,7 @@
  * @param key String
  * return String yyyy-mm-dd
  */
-export function addDateStringSeparator(yyyymmdd, key) {
-  const separator = '-';
+export function addDateStringSeparator(yyyymmdd, key, separator='-') {
   return { [key]: `${yyyymmdd.substring(0, 4)}${separator}${yyyymmdd.substring(4, 6)}${separator}${yyyymmdd.substring(6, 8)}` };
 }
 
