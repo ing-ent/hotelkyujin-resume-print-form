@@ -2,17 +2,10 @@ import * as React from 'react';
 import InputForm from '../Components/InputForm';
 import { getUser, getLabels } from '../api/api';
 
-interface Props {
-  code?: string
-  state?: string
-  clientId?: string
-}
-
-export default function Root(props: Props): any {
+export default function Root(): any {
   const [formValue, setFormValue] = React.useState(null);
   const [labels, setLabels] = React.useState(null);
   React.useEffect(() => {
-    console.log('use effect!!!!!');
     const getData = async () => {
       let qs: any = {};
       var search = window.location.search.substr(1);
@@ -24,30 +17,26 @@ export default function Root(props: Props): any {
           }
         });
       }
+      const labelDatas = await getLabels();
+      setLabels(labelDatas);
       const data = await getUser({
         code: qs?.code,
         clientId: qs?.client_id,
         clientState: qs?.state,
+        labels: labelDatas,
       });
       console.log('view', data);
       setFormValue(data);
     }
-    const getLabelData = async () => {
-      const labelDatas = await getLabels();
-      setLabels(labelDatas);
-    }
     if (formValue === null) {
       getData();
-    }
-    if (labels === null) {
-      getLabelData();
     }
   }, []);
   return (
     <div className="resume-wrapper">
       <div className="resume">
         {formValue !== null && labels !== null ?
-          <InputForm formValue={formValue} labels={labels} />
+          <InputForm formValue={formValue} labels={labels} setFormValue={setFormValue}/>
           : "loading.."
         }
       </div>

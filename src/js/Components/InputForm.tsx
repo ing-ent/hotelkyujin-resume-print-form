@@ -4,28 +4,36 @@ import ResumeHeader from './ResumeHeader';
 import ResumeFooter from './ResumeFooter';
 import PageBreak from './PageBreak';
 import { selectLabel } from '../Utils/ViewFormLabel';
+import { initialFormStateCareers } from '../state/state';
 
 export default function InputForm(props) {
   const [printViewPage, setPrintViewPage] = React.useState(false)
   console.log(props.formValue.careers, props.labels);
-  let careers = props.formValue.careers;
+  let careers = props.formValue.careers || [];
   let ca = {};
-  for (let i = 0; i < careers.length; i++) {
-    for (const key of Object.keys(careers[i])) {
-      if (key === 'employ_type') {
-        ca[`${key}_${i}`] = selectLabel('employType', careers[i][key], props.labels);
-      } else if (key === 'company_name') {
-        ca[`${key}_${i}`] = `${careers[i][key]} ${selectLabel('serviceCategory', careers[i]['s_category'], props.labels)}`;
-      } else {
-        ca[`${key}_${i}`] = careers[i][key];
+  if (careers.length === 0) {
+    careers = [...Array(2)].map((v, i) => i);
+    for (let i = 0; i < careers.length; i++) {
+      for (const key of Object.keys(initialFormStateCareers)) {
+        ca[`${key}_${i}`] = '';
+      }
+    }
+  } else {
+    for (let i = 0; i < careers.length; i++) {
+      for (const key of Object.keys(careers[i])) {
+        if (key === 'employ_type') {
+          ca[`${key}_${i}`] = selectLabel('employType', careers[i][key], props.labels);
+        } else if (key === 'company_name') {
+          ca[`${key}_${i}`] = `${careers[i][key]} ${selectLabel('serviceCategory', careers[i]['s_category'], props.labels)}`;
+        } else {
+          ca[`${key}_${i}`] = careers[i][key];
+        }
       }
     }
   }
   const formValues = {
     ...ca,
     ...props.formValue,
-    ...{ postcode: `${props.formValue.postcode.slice(0, 3)}-${props.formValue.postcode.slice(3, 7)}`},
-    ...{ address: `${selectLabel('address', props.formValue.address1, props.labels)}${props.formValue.address2}${props.formValue.address3}`}
   }
   return (
     <>
@@ -36,6 +44,7 @@ export default function InputForm(props) {
               initialValues={formValues}
               onSubmit={async (values) => {
                 console.log(values);
+                props.setFormValue(values);
                 setPrintViewPage(true);
               }}
             >
@@ -353,7 +362,7 @@ export default function InputForm(props) {
                       </tr>
                       {careers.map((v, i) => {
                         return (
-                          <React.Fragment >
+                          <React.Fragment key={i}>
                           <tr>
                             <td className="text-center dot-right dot-bottom">
                               <Field type="text" name={`start_period_y_${i}`} className="num4"/>
