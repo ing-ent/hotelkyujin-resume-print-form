@@ -8,4 +8,4 @@ import { render } from 'react-dom';
 // @ts-ignore
 import Root from './Containers/Root';
 
-render(<Root code="" state="" clientId="" />, (document.getElementById('root')));
+render(<Root />, (document.getElementById('root')));
