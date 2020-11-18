@@ -4,9 +4,11 @@ import PageBreak from './PageBreak';
 import ResumeFooter from './ResumeFooter';
 
 export default function PrintPage(props) {
-  console.log('print', props.formValue);
   const { formValue } = props;
-  const careers = formValue.careers || [];
+  let careers = formValue.careers || [];
+  if (careers.length === 0) {
+    careers = [...Array(2)].map((v, i) => i);
+  }
   return (
     <>
       <div className="resume-confirm">
@@ -26,7 +28,8 @@ export default function PrintPage(props) {
                   <col span={1} className="w8per"/>
                   <col span={1} className="w6per"/>
                   <col span={1} className="w18per"/>
-                </colgroup>
+              </colgroup>
+              <tbody>
                 <tr>
                   <td className="f10 right-0 dot-bottom print_kana">
                     フリガナ
@@ -119,6 +122,7 @@ export default function PrintPage(props) {
                       E-mail:{formValue.contact_email}
                   </td>
                 </tr>
+              </tbody>
               </table>
 
              <table className="default">
@@ -127,6 +131,7 @@ export default function PrintPage(props) {
                   <col span={1} className="w6per"/>
                   <col span={1} className="w86per"/>
                 </colgroup>
+              <tbody>
                 <tr>
                   <td className="f10 text-center dot-right">年</td>
                   <td className="f10 text-center left-0">月</td>
@@ -180,6 +185,7 @@ export default function PrintPage(props) {
                   </tr>
                 )
               })}
+              </tbody>
               </table>
             <ResumeFooter />
             <PageBreak />
@@ -187,27 +193,32 @@ export default function PrintPage(props) {
                 <colgroup>
                   <col span={1} className="w100per" />
                 </colgroup>
+              <tbody>
                 <tr>
                   <td><p className="f10">免許・資格</p>
                   {formValue.other_comp}
                   </td>
                 </tr>
+              </tbody>
               </table>
 
              <table className="default">
                 <colgroup>
                   <col span={1} className="w100per" />
                 </colgroup>
+              <tbody>
                 <tr>
                   <td><p className="f10">備考　（自己ＰＲなど）</p>
                   {formValue.pr}
                   </td>
                 </tr>
+              </tbody>
               </table>
              <table className="default">
                 <colgroup>
                   <col span={1} className="w100per" />
                 </colgroup>
+              <tbody>
                 <tr>
                   <td><p className="f10">語学スキル・ＰＣ（使用可能ソフト）等</p>
                 TOEIC {formValue.toeic} 点 TOEFL {formValue.toefl} 点 英語検定(STEP) {formValue.sep} 級<br />
@@ -219,6 +230,7 @@ export default function PrintPage(props) {
                   {formValue.pc_othersoft}
                   </td>
                 </tr>
+              </tbody>
               </table>
 
              <table className="default">
@@ -227,6 +239,7 @@ export default function PrintPage(props) {
                   <col span={1} className="w16per" />
                   <col span={1} className="w16per" />
                 </colgroup>
+              <tbody>
                 <tr>
                 <td className="v_top" rowSpan={4}>
                   	<span className="f10">志望動機・特技・好きな学科など</span><br />
@@ -250,17 +263,20 @@ export default function PrintPage(props) {
                   {formValue.fuyou === "1" ? "有" : "無"}
                  	</td>
                 </tr>
+              </tbody>
               </table>
 
              <table className="default">
                 <colgroup>
                   <col span={1} className="w100per" />
                 </colgroup>
+              <tbody>
                 <tr>
                   <td><span className="f10">本人希望記入欄（特に給料・職種・勤務時間・その他についてあれば記入）</span><br />
 		                {formValue.hope}
                   </td>
                 </tr>
+              </tbody>
               </table>
 
             </section>
@@ -280,13 +296,14 @@ export default function PrintPage(props) {
                   <col span={1} className="w6per"/>
                   <col span={1} className="w86per"/>
                 </colgroup>
+              <tbody>
                 <tr>
                   <td className="text-center dot-right">年</td>
                   <td className="text-center left-0">月</td>
                   <td className="top-0 right-0"></td>
                 </tr>
 
-              {formValue.careers.map((v, i) => {
+              {careers.map((v, i) => {
                 return (
                   <React.Fragment key={i}>
                 <tr>
@@ -313,16 +330,15 @@ export default function PrintPage(props) {
 	              	</div>
                   </td>
                   <td className="top-0">
-                        所属：{formValue[`bumon_${i}`]}
-                      職種：{formValue[`syokusyu_${i}`]}<br />
-                      役職：{formValue[`yakusyoku_${i}`]}
-                      雇用形態：{formValue[`employ_type_${i}`]}<br />
+                      所属：{formValue[`bumon_${i}`]} 職種：{formValue[`syokusyu_${i}`]}<br />
+                      役職：{formValue[`yakusyoku_${i}`]} 雇用形態：{formValue[`employ_type_${i}`]}<br />
                       ＜職務内容＞{formValue[`comment_${i}`]}<br />
 	                  </td>
                     </tr>
                   </React.Fragment>
                 )
                 })}
+              </tbody>
               </table>
             </section>
             <ResumeFooter />
