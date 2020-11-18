@@ -6,16 +6,19 @@ import { removePostalCodeSeparator } from '../Utils/ConvertPostalCodeSeparator';
 import { ConvertCheckBoxOption, ConvertSelectBoxOption } from '../Utils/ConvertFormOption';
 import ConvertLabel from '../Utils/ConvertLabel';
 import { Buffer } from 'buffer';
+import { initialFormState } from '../state/state';
+import { selectLabel } from '../Utils/ViewFormLabel';
 
 interface Props {
   code: string
   clientId: string
   clientState: string
+  labels: any
 }
 
 export const getUser = async (props: Props): Promise<any> => {
   console.log(props);
-  const { code, clientId, clientState } = props;
+  const { code, clientId, clientState, labels } = props;
   // @ts-ignore
   const basicCredentials = Buffer.from(`${clientId}:${CLIENT_SECRET}`).toString('base64');
   const headers = {
@@ -52,7 +55,6 @@ export const getUser = async (props: Props): Promise<any> => {
       'X-API-KEY': `Bearer ${accessToken.access_token}`,
     };
 
-    console.log(accessToken);
     // @ts-ignore
     const fetchUserResponse = await fetchWithErrorHandling(`${API_SERVER}/v1/user/info/context`, {
       method: 'get',
@@ -71,6 +73,7 @@ export const getUser = async (props: Props): Promise<any> => {
     }
     // フォームデータ用に整形、マージ
     const formData = {
+      ...initialFormState,
       ...personal,
       ...convertCheckBoxFormData(personal, 'family'),
       ...convertCheckBoxFormData(personal, 'pc_os'),
@@ -92,6 +95,8 @@ export const getUser = async (props: Props): Promise<any> => {
       ...{ toefl: personal.toefl ? personal.toefl : '' },
       ...{ sep: personal.sep ? personal.sep : '' },
       ...{ english: personal.english ? String(personal.english) : '' },
+      ...{ postcode: `${personal.postcode.slice(0, 3)}-${personal.postcode.slice(3, 7)}` },
+      ...{ address: `${selectLabel('address', personal.address1, labels)}${personal.address2}${personal.address3}` },
     };
     // 不要なプロパティは削除
     delete formData.l_name;
@@ -114,13 +119,9 @@ export const getUser = async (props: Props): Promise<any> => {
     delete formData.pc_soft6;
     delete formData.pc_hotelsoft1;
     delete formData.pc_hotelsoft2;
-    console.log(formData);
     return formData;
-    } catch (err) {
-      console.log(err);
-      const error = await err.response;
-      console.log(error)
-    } finally {
+  } catch (err) {
+    return initialFormState;
   };
 }
 
