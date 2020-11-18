@@ -5,6 +5,7 @@ import ResumeFooter from './ResumeFooter';
 import PageBreak from './PageBreak';
 import { selectLabel } from '../Utils/ViewFormLabel';
 import { initialFormStateCareers } from '../state/state';
+import PrintPage from './PrintPage';
 
 export default function InputForm(props) {
   const [printViewPage, setPrintViewPage] = React.useState(false)
@@ -24,6 +25,7 @@ export default function InputForm(props) {
         if (key === 'employ_type') {
           ca[`${key}_${i}`] = selectLabel('employType', careers[i][key], props.labels);
         } else if (key === 'company_name') {
+          ca[`company_${i}`] = `${careers[i][key]}`;
           ca[`${key}_${i}`] = `${careers[i][key]} ${careers[i]['service_name']} (${selectLabel('serviceCategory', careers[i]['s_category'], props.labels)})`;
         } else if (key === 'end_period_y') {
           ca[`${key}_${i}`] = careers[i][key] === '9999' ? '現在に至る' : careers[i][key];
@@ -42,6 +44,8 @@ export default function InputForm(props) {
     <>
       {!printViewPage ?
         <>
+          <div className="resume-wrapper">
+            <div className="resume">
             <Formik
               enableReinitialize
               initialValues={formValues}
@@ -408,10 +412,12 @@ export default function InputForm(props) {
                   </section>
                 </Form>
               )}
-            </Formik>
+              </Formik>
+              </div>
+              </div>
           </>
         : <>
-          <h1>印刷画面</h1>
+          <PrintPage formValue={props.formValue} labels={props.labels}/>
           <button onClick={() => setPrintViewPage(false)}>戻る</button>
           </>
       }

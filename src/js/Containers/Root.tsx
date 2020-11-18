@@ -33,13 +33,11 @@ export default function Root(): any {
     }
   }, []);
   return (
-    <div className="resume-wrapper">
-      <div className="resume">
-        {formValue !== null && labels !== null ?
-          <InputForm formValue={formValue} labels={labels} setFormValue={setFormValue}/>
-          : "loading.."
-        }
-      </div>
-    </div>
+    <>
+      {formValue !== null && labels !== null ?
+        <InputForm formValue={formValue} labels={labels} setFormValue={setFormValue}/>
+        : "loading.."
+      }
+    </>
   );
 }
