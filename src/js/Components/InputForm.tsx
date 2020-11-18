@@ -9,7 +9,6 @@ import PrintPage from './PrintPage';
 
 export default function InputForm(props) {
   const [printViewPage, setPrintViewPage] = React.useState(false)
-  console.log(props.formValue.careers, props.labels);
   let careers = props.formValue.careers || [];
   let ca = {};
   if (careers.length === 0) {
@@ -418,7 +417,6 @@ export default function InputForm(props) {
           </>
         : <>
           <PrintPage formValue={props.formValue} labels={props.labels}/>
-          <button onClick={() => setPrintViewPage(false)}>戻る</button>
           </>
       }
     </>

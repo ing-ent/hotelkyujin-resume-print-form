@@ -342,6 +342,10 @@ export default function PrintPage(props) {
               </table>
             </section>
             <ResumeFooter />
+            <section className="resume-submit">
+                <button onClick={() => props.setPrintViewPage(false)} style={{margin: '0 10px', padding: '10px'}}>戻る</button>
+            <button onClick={() => window.print()} style={{ margin: '0 10px', padding: '10px' }}>印刷する</button>
+            </section>
           </div>
         </div>
     </>

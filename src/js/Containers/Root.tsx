@@ -36,7 +36,7 @@ export default function Root(): any {
     <>
       {formValue !== null && labels !== null ?
         <InputForm formValue={formValue} labels={labels} setFormValue={setFormValue}/>
-        : "loading.."
+        : <div className="resume-wrapper">読み込み中....</div>
       }
     </>
   );
