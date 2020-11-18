@@ -40,7 +40,6 @@ export function checkboxLabel(field, values, labels) {
 
 export function selectLabel(field, value, labels) {
   let label;
-  console.log(field, value);
   if (value === undefined || Number(value) == 0) {
     return '';
   }
@@ -53,6 +52,5 @@ export function selectLabel(field, value, labels) {
       }
     }
   }
-  console.log(label);
   return label;
 }
